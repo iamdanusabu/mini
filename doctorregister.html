@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register for Doctors</title>
+    <link rel="stylesheet" href="uploadstyles.css">
+</head>
+
+<body>
+    <div id="preloader"></div>
+    <nav>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="doctorlogin.html">Login</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <form action="" id="contactForm">
+            <div class="alert">Please Check your Phone/Mail for Updates</div>
+
+            <div class="inputBox">
+                <input type="text" id="name" placeholder="Your name...." />
+            </div>
+
+            <div class="inputBox">
+                <input type="email" id="emailid" placeholder="Your Email....." />
+            </div>
+            <div class="inputBox">
+                <input type="text" id="phone" placeholder="Enter your Phone" />
+            </div>
+
+            <div class="inputBox">
+                <textarea class="messageContent" id="msgContent" cols="30" rows="10" placeholder="Field of Medicine"></textarea>
+            </div>
+            <div class="file">
+                <p class="label">Please Upload your Valid Document- Liable for Manual Checking-filename should be yourname+extension of file</p>
+                <input type="file" id="fileButton" name="fileButton">
+            </div>
+            <div class="inputBox">
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js" type="module"></script>
+    <script>
+        var loader=document.getElementById("preloader");
+window.addEventListener('load', function(load) {
+  window.removeEventListener('load', load, false);               
+  setTimeout(function(){loader.style.display = 'none'},500);
+
+},false);
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytesResumable } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+
+        const firebaseConfig = {
+    apiKey: "AIzaSyAW_hh9ta2OJ7blpr1Xt9zcRE_rMOZKzn4",
+    authDomain: "sodium-platform-316710.firebaseapp.com",
+    databaseURL: "https://sodium-platform-316710-default-rtdb.firebaseio.com",
+    projectId: "sodium-platform-316710",
+    storageBucket: "sodium-platform-316710.appspot.com",
+    messagingSenderId: "656532454851",
+    appId: "1:656532454851:web:70e00457309b64555e1176"
+  };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase();
+        const storage = getStorage();
+        const storageFileRef = storageRef(storage, "Files/"); // Initialize storage reference
+
+        const contactFormDB = ref(database, "contactForm");
+
+        document.getElementById("contactForm").addEventListener("submit", submitForm);
+
+        async function submitForm(e) {
+            e.preventDefault();
+
+            const name = getElementVal("name");
+            const emailid = getElementVal("emailid");
+            const phone = getElementVal("phone");
+            const msgContent = getElementVal("msgContent");
+
+            await saveMessages(name, emailid, phone, msgContent);
+
+            // Enable alert
+            document.querySelector(".alert").style.display = "block";
+            alert("Your Certificates will be Manually inspected, and your Unique Login Code will be Mailed/SMS to you");
+
+            // Remove the alert after 3 seconds
+            setTimeout(() => {
+                document.querySelector(".alert").style.display = "none";
+            }, 3000);
+
+            // Reset the form
+            document.getElementById("contactForm").reset();
+        }
+
+        const saveMessages = async (name, emailid, phone, msgContent) => {
+            const newContactFormRef = push(contactFormDB);
+
+            await set(newContactFormRef, {
+                name: name,
+                emailid: emailid,
+                phone: phone,
+                msgContent: msgContent,
+            });
+
+            const fileInput = document.getElementById("fileButton");
+            const files = fileInput.files;
+
+            for (let i = 0; i < files.length; i++) {
+                const imageFile = files[i];
+                const fileRef = storageRef(storageFileRef, imageFile.name); // Use storageRef from storageFileRef
+
+                await uploadFile(fileRef, imageFile);
+            }
+        };
+
+        const getElementVal = (id) => {
+            return document.getElementById(id).value;
+        };
+
+        // Function to upload file using uploadBytesResumable
+        const uploadFile = (fileRef, file) => {
+            return new Promise((resolve, reject) => {
+                const uploadTask = uploadBytesResumable(fileRef, file);
+
+                uploadTask.on(
+                    "state_changed",
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.log(`Upload progress: ${progress}%`);
+                    },
+                    (error) => {
+                        console.error("Error occurred during upload:", error);
+                        reject(error);
+                    },
+                    () => {
+                        console.log("Upload completed!");
+                        resolve();
+                    }
+                );
+            });
+        };
+    </script>
+</body>
+
+</html>

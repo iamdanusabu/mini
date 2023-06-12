@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1250px;
+      margin: 0 auto;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 5px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      margin-top: 30px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      padding-top: 15px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-right: 10px;
+    }
+    #field-input {
+      width: 70px;
+    }
+
+    input[type="submit"] {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    h2 {
+      padding-left: 25px;
+      margin-left: 50px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 10px;
+    }
+
+    .error-message {
+      color: red;
+      margin-bottom: 10px;
+    }
+
+    .container {
+      position: relative;
+    }
+
+    #logoutButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #f44336;
+      color: #fff;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #search-input {
+      padding-right: 100px; /* Adjust this value based on the button width */
+    }
+    #warning-message{
+      padding-left:0px;
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Patient Data</h1>
+
+    <form id="search-form">
+      <input type="text" id="search-input" placeholder="Enter Patient ID">
+      <input type="submit" value="Search">
+    </form>
+    <button id="logoutButton" type="button">Logout</button>
+
+    <div id="documentData"></div>
+
+    <form id="add-field-form">
+      <input type="text" id="field-input" placeholder="Serial">
+      <input type="text" class="value-input" placeholder="Date">
+      <input type="text" class="value-input" placeholder="Medicine">
+      <input type="text" class="value-input" placeholder="Remarks">
+      <input type="text" class="value-input" placeholder="Hospital">
+      <input type="submit" value="Add Field">
+    </form>
+    <div id="warning-message"></div>
+
+    <div class="error-message" id="error-message"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js" type="module"></script>
+    <script src="doctorupdate.js" type="module"></script>
+  </div>  
+</body>
+
+</html>

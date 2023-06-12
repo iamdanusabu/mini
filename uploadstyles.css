@@ -1,0 +1,179 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    align-items: center;
+}
+
+.container{
+    width: 25%;
+    height: 60vh;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow:  0px 5px 25px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: column;
+}
+.carousel {
+    position: relative;
+    width: 100%;
+    height: 400px; /* Adjust the height as needed */
+    overflow: hidden;
+  }
+  
+  .carousel-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .carousel-item {
+    position: relative;
+  }
+  
+  .button-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .view-prescription {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+nav {
+    background-color: #ffffff;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    height: 50px;
+    z-index: 1;
+  }
+  
+  nav ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+    display: flex;
+    justify-content: flex-end;
+    font-weight: 100;
+    text-decoration: none;
+  }
+  
+  nav ul li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+  nav ul li a{
+    text-decoration: none;
+  }
+
+.container form{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: column;
+}
+
+.inputBox{
+    width: 100%;
+    margin: 10px 0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.inputBox input[type="text"], .inputBox input[type="email"]{
+    width: 100%;
+    height: 50px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.2);
+    padding: 0px 10px;
+    font-size: 16px;
+    color: #444;
+}
+
+.inputBox textarea{
+    width: 100%;
+    height: 120px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.2);
+    padding: 0px 10px;
+    font-size: 16px;
+    color: #444;
+}
+
+.inputBox button{
+    width: 100%;    
+    padding: 10px 20px;
+    border: none;
+    outline: none;
+    background: rgb(27, 186, 19);
+    color: #FFF;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    
+}
+
+.inputBox button:hover{
+    background: rgb(23, 201, 14);
+    transition: all 0.3s ease;
+}
+
+::placeholder{
+    font-size: 16px;
+}
+
+.alert{
+    width: 100%;
+    background: rgb(0, 255, 106);
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 900;
+    display: none;
+}
+.label{
+     font-size: 10px;
+     padding-bottom: 10px;
+     font-family:Arial, Helvetica, sans-serif;
+}
+.messageContent{
+    font-family: Arial, Helvetica, sans-serif;
+    padding-top: 10px;
+}
+#preloader {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: #ffffff url(https://cutewallpaper.org/21/loading-gif-transparent-background/Loading-GIF-on-Inspirationde.gif)no-repeat center center;
+  background-size: 2%;
+  z-index: 9999;
+}

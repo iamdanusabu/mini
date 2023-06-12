@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 100px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        .inputBox {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #777;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button[type="submit"] {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        p {
+            text-align: center;
+            color: #777;
+        }
+
+        a {
+            color: #4caf50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Login</h1>
+        <form id="loginForm">
+            <div class="inputBox">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="inputBox">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            <div class="inputBox">
+                <button type="submit">Login</button>
+            </div>
+        </form>
+        <p>Don't have an account? <a href="doctorregister.html">Register here</a></p>
+
+        <!-- Logout Button -->
+        <button id="logoutButton" style="display: none;">Logout</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js" type="module"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAW_hh9ta2OJ7blpr1Xt9zcRE_rMOZKzn4",
+            authDomain: "sodium-platform-316710.firebaseapp.com",
+            // Add more Firebase config properties as needed
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+
+        const loginForm = document.getElementById('loginForm');
+        const logoutButton = document.getElementById('logoutButton');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // User signed in successfully
+                    const user = userCredential.user;
+                    console.log(user);
+                    alert("Login successful!");
+                    
+                    logoutButton.style.display = 'block'; // Show the logout button
+                    window.location.href="doctorupdate.html"
+                      
+                    // Redirect the user to another page or perform any necessary actions
+                })
+                .catch((error) => {
+                    // An error occurred during login
+                    console.error(error);
+                    alert("Login failed. Please check your email and password.");
+                });
+        });
+
+        logoutButton.addEventListener('click', () => {
+            signOut(auth)
+                .then(() => {
+                    // User signed out successfully
+                    console.log("User signed out");
+                    logoutButton.style.display = 'none'; // Hide the logout button
+                    // Perform any necessary actions after logout
+                })
+                .catch((error) => {
+                    // An error occurred during logout
+                    console.error(error);
+                });
+        });
+    </script>
+</body>
+
+</html>
