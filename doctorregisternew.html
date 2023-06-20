@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register for Doctors</title>
+  <style>
+    body {
+      background-color: #f2f2f2;
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .file-upload {
+      border: 1px dashed #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 14px;
+      color: #777;
+      cursor: pointer;
+    }
+
+    button[type="submit"] {
+      background-color: #4caf50;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .alert {
+      display: none;
+      margin-bottom: 15px;
+      padding: 15px;
+      background-color: #f44336;
+      color: #fff;
+      border-radius: 5px;
+    }
+    .aadhar-upload {
+      border: 1px dashed #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 14px;
+      color: #777;
+      cursor: pointer;
+    }
+
+    .aadhar-upload p {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Register for Doctors</h1>
+    <form action="" id="contactForm">
+      <div class="alert">Please check your phone/email for updates.</div>
+
+      <div class="form-group">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" placeholder="Your name...." required>
+      </div>
+
+      <div class="form-group">
+        <label for="emailid">Your Email</label>
+        <input type="email" id="emailid" placeholder="Your email....." required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input type="text" id="phone" placeholder="Enter your phone" required>
+      </div>
+
+      <div class="form-group">
+        <label for="mbbsLicense">MBBS License Number</label>
+        <input type="text" id="mbbsLicense" placeholder="Enter your MBBS license number" required>
+      </div>
+
+      <div class="form-group">
+        <label for="dob">Date of Registration</label>
+        <input type="date" id="dob" required>
+      </div>
+
+      <div class="form-group">
+        <label for="college">College Name</label>
+        <input type="text" id="college" placeholder="Enter your college name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="specialization">Field of Specialization</label>
+        <input type="text" id="specialization" placeholder="Enter your field of specialization" required>
+      </div>
+
+      <div class="form-group">
+        <label for="registrationCouncil">Registration Council Name</label>
+        <input type="text" id="registrationCouncil" placeholder="Enter your registration council name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="msgContent">Field of Medicine</label>
+        <textarea id="msgContent" rows="5" placeholder="Describe your field of medicine"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="fileButton">Upload Valid Document (Liable for Manual Checking)</label>
+        <div class="file-upload">
+          <input type="file" id="fileButton" name="fileButton" required>
+          <p>Drag and drop file or click here to upload</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="aadharCard">Upload Aadhar Card</label>
+        <div class="aadhar-upload">
+          <input type="file" id="aadharCard" name="aadharCard" required>
+          <p>Drag and drop file or click here to upload</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js" type="module"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytesResumable } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+
+    // Initialize Firebase
+    const firebaseConfig = {
+    apiKey: "AIzaSyAW_hh9ta2OJ7blpr1Xt9zcRE_rMOZKzn4",
+    authDomain: "sodium-platform-316710.firebaseapp.com",
+    databaseURL: "https://sodium-platform-316710-default-rtdb.firebaseio.com",
+    projectId: "sodium-platform-316710",
+    storageBucket: "sodium-platform-316710.appspot.com",
+    messagingSenderId: "656532454851",
+    appId: "1:656532454851:web:70e00457309b64555e1176"
+  };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase();
+    const storage = getStorage();
+    const storageFileRef = storageRef(storage, "Files/"); // Initialize storage reference
+
+    const contactFormDB = ref(database, "contactForm");
+
+    document.getElementById("contactForm").addEventListener("submit", submitForm);
+
+    async function submitForm(e) {
+      e.preventDefault();
+
+      const name = getElementVal("name");
+      const emailid = getElementVal("emailid");
+      const phone = getElementVal("phone");
+      const mbbsLicense = getElementVal("mbbsLicense");
+      const dob = getElementVal("dob");
+      const college = getElementVal("college");
+      const specialization = getElementVal("specialization");
+      const registrationCouncil = getElementVal("registrationCouncil");
+      const fileInput = document.getElementById("fileButton");
+      const files = fileInput.files;
+      const aadharCardFile = document.getElementById("aadharCard").files[0];
+
+      await saveMessages(name, emailid, phone, mbbsLicense, dob, college, specialization, registrationCouncil);
+
+      // Enable alert
+      document.querySelector(".alert").style.display = "block";
+      alert("Your certificates will be manually inspected, and your unique login code will be emailed/SMS to you.");
+
+      // Remove the alert after 3 seconds
+      setTimeout(() => {
+        document.querySelector(".alert").style.display = "none";
+      }, 3000);
+
+      // Reset the form
+      document.getElementById("contactForm").reset();
+    }
+
+    const saveMessages = async (name, emailid, phone, mbbsLicense, dob, college, specialization, registrationCouncil) => {
+      const newContactFormRef = push(contactFormDB);
+
+      await set(newContactFormRef, {
+        name: name,
+        emailid: emailid,
+        phone: phone,
+        mbbsLicense: mbbsLicense,
+        dob: dob,
+        college: college,
+        specialization: specialization,
+        registrationCouncil: registrationCouncil,
+      });
+
+      const documentFileInput = document.getElementById("fileButton");
+      const documentFiles = documentFileInput.files;
+
+      for (let i = 0; i < documentFiles.length; i++) {
+        const documentImageFile = documentFiles[i];
+        const documentFileRef = storageRef(storageFileRef, documentImageFile.name); // Use storageRef from storageFileRef
+
+        await uploadFile(documentFileRef, documentImageFile);
+      }
+
+      const aadhaarFileInput = document.getElementById("aadharCard");
+      const aadhaarFiles = aadhaarFileInput.files;
+
+      for (let i = 0; i < aadhaarFiles.length; i++) {
+        const aadhaarImageFile = aadhaarFiles[i];
+        const aadhaarFileRef = storageRef(storageFileRef, aadhaarImageFile.name); // Use storageRef from storageFileRef
+
+        await uploadFile(aadhaarFileRef, aadhaarImageFile);
+      }
+    };
+
+    const getElementVal = (id) => {
+      return document.getElementById(id).value;
+    };
+
+    // Function to upload file using uploadBytesResumable
+    const uploadFile = (fileRef, file) => {
+      return new Promise((resolve, reject) => {
+        const uploadTask = uploadBytesResumable(fileRef, file);
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log(`Upload progress: ${progress}%`);
+          },
+          (error) => {
+            console.error("Error occurred during upload:", error);
+            reject(error);
+          },
+          () => {
+            console.log("Upload completed!");
+            resolve();
+          }
+        );
+      });
+    };
+  </script>
+</body>
+
+</html>
