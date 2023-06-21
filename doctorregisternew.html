@@ -96,10 +96,51 @@
     .aadhar-upload p {
       margin-top: 10px;
     }
+    .a{
+      text-decoration: none;
+
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    nav {
+      background-color: #333;
+      color: #fff;
+    }
+
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    nav ul li {
+      padding: 10px;
+    }
+
+    nav ul li a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    nav ul li:hover {
+      background-color: #555;
+    }
   </style>
 </head>
 
 <body>
+  <nav>
+    <ul>
+    <li><a href="doctorlogin.html">Login</a>
+    </li>
+    <li><a href="home.html">Home</a></li>
+  </ul>
+  </nav>
   <div class="container">
     <h1>Register for Doctors</h1>
     <form action="" id="contactForm">
@@ -112,37 +153,37 @@
 
       <div class="form-group">
         <label for="emailid">Your Email</label>
-        <input type="email" id="emailid" placeholder="Your email....." required>
+        <input type="email" id="emailid" placeholder="Your email....." >
       </div>
 
       <div class="form-group">
         <label for="phone">Phone Number</label>
-        <input type="text" id="phone" placeholder="Enter your phone" required>
+        <input type="text" id="phone" placeholder="Enter your phone" >
       </div>
 
       <div class="form-group">
         <label for="mbbsLicense">MBBS License Number</label>
-        <input type="text" id="mbbsLicense" placeholder="Enter your MBBS license number" required>
+        <input type="text" id="mbbsLicense" placeholder="Enter your MBBS license number" >
       </div>
 
       <div class="form-group">
         <label for="dob">Date of Registration</label>
-        <input type="date" id="dob" required>
+        <input type="date" id="dob" >
       </div>
 
       <div class="form-group">
         <label for="college">College Name</label>
-        <input type="text" id="college" placeholder="Enter your college name" required>
+        <input type="text" id="college" placeholder="Enter your college name" >
       </div>
 
       <div class="form-group">
         <label for="specialization">Field of Specialization</label>
-        <input type="text" id="specialization" placeholder="Enter your field of specialization" required>
+        <input type="text" id="specialization" placeholder="Enter your field of specialization" >
       </div>
 
       <div class="form-group">
         <label for="registrationCouncil">Registration Council Name</label>
-        <input type="text" id="registrationCouncil" placeholder="Enter your registration council name" required>
+        <input type="text" id="registrationCouncil" placeholder="Enter your registration council name" >
       </div>
 
       <div class="form-group">
@@ -153,7 +194,7 @@
       <div class="form-group">
         <label for="fileButton">Upload Valid Document (Liable for Manual Checking)</label>
         <div class="file-upload">
-          <input type="file" id="fileButton" name="fileButton" required>
+          <input type="file" id="fileButton" name="fileButton" >
           <p>Drag and drop file or click here to upload</p>
         </div>
       </div>
@@ -161,7 +202,7 @@
       <div class="form-group">
         <label for="aadharCard">Upload Aadhar Card</label>
         <div class="aadhar-upload">
-          <input type="file" id="aadharCard" name="aadharCard" required>
+          <input type="file" id="aadharCard" name="aadharCard" >
           <p>Drag and drop file or click here to upload</p>
         </div>
       </div>
@@ -200,70 +241,75 @@
 
     document.getElementById("contactForm").addEventListener("submit", submitForm);
 
-    async function submitForm(e) {
-      e.preventDefault();
+    // ...
 
-      const name = getElementVal("name");
-      const emailid = getElementVal("emailid");
-      const phone = getElementVal("phone");
-      const mbbsLicense = getElementVal("mbbsLicense");
-      const dob = getElementVal("dob");
-      const college = getElementVal("college");
-      const specialization = getElementVal("specialization");
-      const registrationCouncil = getElementVal("registrationCouncil");
-      const fileInput = document.getElementById("fileButton");
-      const files = fileInput.files;
-      const aadharCardFile = document.getElementById("aadharCard").files[0];
+async function submitForm(e) {
+  e.preventDefault();
 
-      await saveMessages(name, emailid, phone, mbbsLicense, dob, college, specialization, registrationCouncil);
+  const name = getElementVal("name");
+  const emailid = getElementVal("emailid");
+  const phone = getElementVal("phone");
+  const mbbsLicense = getElementVal("mbbsLicense");
+  const dob = getElementVal("dob");
+  const college = getElementVal("college");
+  const specialization = getElementVal("specialization");
+  const registrationCouncil = getElementVal("registrationCouncil");
+  const fileInput = document.getElementById("fileButton");
+  const files = fileInput.files;
+  const aadharCardFile = document.getElementById("aadharCard").files[0];
 
-      // Enable alert
-      document.querySelector(".alert").style.display = "block";
-      alert("Your certificates will be manually inspected, and your unique login code will be emailed/SMS to you.");
+  await saveMessages(name, emailid, phone, mbbsLicense, dob, college, specialization, registrationCouncil, files, aadharCardFile);
 
-      // Remove the alert after 3 seconds
-      setTimeout(() => {
-        document.querySelector(".alert").style.display = "none";
-      }, 3000);
+  // Enable alert
+  document.querySelector(".alert").style.display = "block";
+  alert("Your certificates will be manually inspected, and your unique login code will be emailed/SMS to you.");
 
-      // Reset the form
-      document.getElementById("contactForm").reset();
-    }
+  // Remove the alert after 3 seconds
+  setTimeout(() => {
+    document.querySelector(".alert").style.display = "none";
+  }, 3000);
 
-    const saveMessages = async (name, emailid, phone, mbbsLicense, dob, college, specialization, registrationCouncil) => {
-      const newContactFormRef = push(contactFormDB);
+  // Reset the form
+  document.getElementById("contactForm").reset();
+}
 
-      await set(newContactFormRef, {
-        name: name,
-        emailid: emailid,
-        phone: phone,
-        mbbsLicense: mbbsLicense,
-        dob: dob,
-        college: college,
-        specialization: specialization,
-        registrationCouncil: registrationCouncil,
-      });
+const saveMessages = async (name, emailid, phone, mbbsLicense, dob, college, specialization, registrationCouncil, files, aadharCardFile) => {
+  const newContactFormRef = push(contactFormDB);
+  const newContactForm2Ref = push(ref(database, "Doctor Details"));
 
-      const documentFileInput = document.getElementById("fileButton");
-      const documentFiles = documentFileInput.files;
+  const contactFormData = {
+    name: name,
+    emailid: emailid,
+    phone: phone,
+    mbbsLicense: mbbsLicense,
+    dob: dob,
+    college: college,
+    specialization: specialization,
+    registrationCouncil: registrationCouncil,
+  };
 
-      for (let i = 0; i < documentFiles.length; i++) {
-        const documentImageFile = documentFiles[i];
-        const documentFileRef = storageRef(storageFileRef, documentImageFile.name); // Use storageRef from storageFileRef
+  await set(newContactFormRef, contactFormData);
+  await set(newContactForm2Ref, contactFormData);
 
-        await uploadFile(documentFileRef, documentImageFile);
-      }
 
-      const aadhaarFileInput = document.getElementById("aadharCard");
-      const aadhaarFiles = aadhaarFileInput.files;
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const fileName = `${name}+certificate.${file.name.split(".").pop()}`; // Generate the filename
 
-      for (let i = 0; i < aadhaarFiles.length; i++) {
-        const aadhaarImageFile = aadhaarFiles[i];
-        const aadhaarFileRef = storageRef(storageFileRef, aadhaarImageFile.name); // Use storageRef from storageFileRef
+    const fileRef = storageRef(storageFileRef, fileName);
 
-        await uploadFile(aadhaarFileRef, aadhaarImageFile);
-      }
-    };
+    await uploadFile(fileRef, file);
+  }
+
+  const aadhaarFileName = `${name}+aadhar.${aadharCardFile.name.split(".").pop()}`; // Generate the filename
+
+  const aadharFileRef = storageRef(storageFileRef, aadhaarFileName);
+
+  await uploadFile(aadharFileRef, aadharCardFile);
+};
+
+// ...
+
 
     const getElementVal = (id) => {
       return document.getElementById(id).value;

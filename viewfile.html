@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View User Files</title>
+  <style>
+    body {
+      background-color: #f2f2f2;
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .file-list {
+      margin-top: 20px;
+    }
+
+    .file-list-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .file-list-item span {
+      margin-left: 10px;
+    }
+
+    .file-list-item a {
+      margin-left: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>View User Files</h1>
+    <form action="" id="usernameForm">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter username" required>
+      </div>
+
+      <div class="form-group">
+        <button type="submit">View Files</button>
+      </div>
+    </form>
+
+    <div class="file-list" id="fileList">
+      <!-- File list will be populated dynamically -->
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js" type="module"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getDatabase, ref, get, child, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+    import { getStorage, ref as storageRef, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+
+    // Initialize Firebase
+    const firebaseConfig = {
+    apiKey: "AIzaSyAW_hh9ta2OJ7blpr1Xt9zcRE_rMOZKzn4",
+    authDomain: "sodium-platform-316710.firebaseapp.com",
+    databaseURL: "https://sodium-platform-316710-default-rtdb.firebaseio.com",
+    projectId: "sodium-platform-316710",
+    storageBucket: "sodium-platform-316710.appspot.com",
+    messagingSenderId: "656532454851",
+    appId: "1:656532454851:web:70e00457309b64555e1176"
+  };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase();
+    const storage = getStorage();
+    const storageFileRef = storageRef(storage, "Files/");
+
+    document.getElementById("usernameForm").addEventListener("submit", viewUserFiles);
+
+    async function viewUserFiles(e) {
+      e.preventDefault();
+
+      const username = getElementVal("username");
+      const userRef = ref(database, "contactForm");
+      const queryRef = query(userRef, orderByChild("name"), equalTo(username));
+
+      try {
+        const snapshot = await get(queryRef);
+        if (snapshot.exists()) {
+          const user = snapshot.val();
+          const userId = Object.keys(user)[0];
+          const filesRef = storageRef(storageFileRef, userId);
+
+          const downloadUrls = await retrieveFileDownloadUrls(filesRef);
+          displayFileList(downloadUrls);
+        } else {
+          console.log("User not found.");
+          displayFileList([]);
+        }
+      } catch (error) {
+        console.error("Error occurred while retrieving user files:", error);
+        displayFileList([]);
+      }
+    }
+
+    const retrieveFileDownloadUrls = async (filesRef) => {
+      const files = await filesRef.listAll();
+
+      const downloadUrls = await Promise.all(
+        files.items.map(async (file) => {
+          const downloadUrl = await getDownloadURL(file);
+          return { name: file.name, url: downloadUrl };
+        })
+      );
+
+      return downloadUrls;
+    };
+
+    const displayFileList = (fileList) => {
+      const fileListContainer = document.getElementById("fileList");
+      fileListContainer.innerHTML = "";
+
+      if (fileList.length > 0) {
+        fileList.forEach((file) => {
+          const listItem = document.createElement("div");
+          listItem.className = "file-list-item";
+
+          const fileIcon = document.createElement("span");
+          fileIcon.innerHTML = "📄";
+
+          const fileName = document.createElement("span");
+          fileName.textContent = file.name;
+
+          const downloadLink = document.createElement("a");
+          downloadLink.href = file.url;
+          downloadLink.textContent = "Download";
+
+          listItem.appendChild(fileIcon);
+          listItem.appendChild(fileName);
+          listItem.appendChild(downloadLink);
+
+          fileListContainer.appendChild(listItem);
+        });
+      } else {
+        const noFilesMessage = document.createElement("p");
+        noFilesMessage.textContent = "No files found for the given username.";
+
+        fileListContainer.appendChild(noFilesMessage);
+      }
+    };
+
+    const getElementVal = (id) => {
+      return document.getElementById(id).value;
+    };
+  </script>
+</body>
+
+</html>

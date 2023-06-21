@@ -54,13 +54,13 @@ const firebaseConfig = {
           if (snapshot.exists()) {
               snapshot.forEach((childSnapshot) => {
                   const registration = childSnapshot.val();
-                  const { name, emailid, msgContent } = registration;
+                  const { name, emailid,mbbsLicense, dob } = registration;
   
                   const row = document.createElement('tr');
                   row.innerHTML = `
                       <td>${name}</td>
-                      <td>${emailid}</td>
-                      <td>${msgContent}</td>
+                      <td>${mbbsLicense}</td>
+                      <td>${dob}</td>
                       <td>
                           <button class="acceptBtn" data-email="${emailid}">Accept</button>
                           <button class="rejectBtn" data-email="${emailid}">Reject</button>
@@ -90,40 +90,58 @@ const firebaseConfig = {
       }
   }
   
-  async function acceptRegistration() {
-      const email = this.getAttribute('data-email');
+  // ...
+
+async function acceptRegistration() {
+    const email = this.getAttribute('data-email');
+    const row = this.parentNode.parentNode; // Get the parent row element
   
-      try {
-          // Create a user with the provided email and password
-          const password = email.split('@')[0]; // Set the password as the emailid
-          const { user } = await createUserWithEmailAndPassword(auth, email, password);
+    try {
+      // Create a user with the provided email and password
+      const password = email.split('@')[0]; // Set the password as the emailid
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
   
-          // Send password reset email to the user
-          await sendPasswordResetEmail(auth, email);
+      // Send password reset email to the user
+      await sendPasswordResetEmail(auth, email);
   
-          alert('Doctor registration accepted. Password reset email sent.');
+      alert('Doctor registration accepted. Password reset email sent.');
   
-          // Delete the doctor registration from the database
-          await remove(child(ref(database), `contactForm/${email.replace('.', ',')}`));
-      } catch (error) {
-          console.error(error);
-          alert('Failed to accept doctor registration. Please try again later.');
-      }
+      // Delete the doctor registration from the database
+      await remove(child(ref(database), `contactForm/${email.replace('.', ',')}`));
+  
+      // Transition animation before removing the row from the table
+      row.style.opacity = '0';
+      row.style.transform = 'translateY(-20px)';
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Delay for transition animation
+      row.remove();
+    } catch (error) {
+      console.error(error);
+      alert('Failed to accept doctor registration. Please try again later.');
+    }
   }
   
   async function rejectRegistration() {
-      const email = this.getAttribute('data-email');
+    const email = this.getAttribute('data-email');
+    const row = this.parentNode.parentNode; // Get the parent row element
   
-      try {
-          // Delete the doctor registration from the database
-          await remove(child(ref(database), `contactForm/${email.replace('.', ',')}`));
+    try {
+      // Delete the doctor registration from the database
+      await remove(child(ref(database), `contactForm/${email.replace('.', ',')}`));
   
-          alert('Doctor registration rejected.');
-      } catch (error) {
-          console.error(error);
-          alert('Failed to reject doctor registration. Please try again later.');
-      }
+      // Transition animation before removing the row from the table
+      row.style.opacity = '0';
+      row.style.transform = 'translateY(-20px)';
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Delay for transition animation
+      row.remove();
+  
+      alert('Doctor registration rejected.');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to reject doctor registration. Please try again later.');
+    }
   }
+  
+  // ...
   
   // Next Button
   nextButton.addEventListener('click', fetchDoctorRegistrations);
