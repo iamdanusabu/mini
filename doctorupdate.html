@@ -14,7 +14,7 @@
     }
 
     .container {
-      max-width: 1250px;
+      max-width: 900px;
       margin: 0 auto;
       background-color: #fff;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -25,35 +25,51 @@
     h1 {
       text-align: center;
       margin-bottom: 20px;
+      text-decoration: underline;
     }
 
     form {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
       align-items: center;
       margin-bottom: 20px;
       margin-top: 30px;
     }
 
-    input[type="text"] {
+    input[type="text"],
+    input[type="submit"] {
+      width: 100%;
       padding: 10px;
-      padding-top: 15px;
       font-size: 16px;
       border-radius: 5px;
       border: 1px solid #ccc;
-      margin-right: 10px;
+      margin-bottom: 10px;
     }
-    #field-input {
-      width: 70px;
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      width: 100px;
+      cursor: pointer;
     }
 
-    input[type="submit"] {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #4CAF50;
+    #field-input {
+      width: 100%;
+      max-width: 70px;
+    }
+
+    #search-input {
+      flex-grow: 1;
+      margin-right: 10px;
+    }
+
+    #logoutButton {
+      margin-left: auto;
+      background-color: #f44336;
       color: #fff;
+      padding: 8px 16px;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
     }
 
@@ -65,6 +81,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
     }
 
     th,
@@ -72,6 +89,7 @@
       padding: 10px;
       text-align: left;
       border-bottom: 1px solid #ddd;
+      word-break: break-word;
     }
 
     th {
@@ -93,20 +111,56 @@
       position: absolute;
       top: 10px;
       right: 10px;
-      background-color: #f44336;
-      color: #fff;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
     }
 
     #search-input {
-      padding-right: 100px; /* Adjust this value based on the button width */
+      padding-right: 120px;
     }
-    #warning-message{
-      padding-left:0px;
+
+    #warning-message {
+      padding-left: 0px;
       color: red;
+    }
+
+    /* Responsive Styles */
+    @media screen and (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      form {
+        flex-direction: column;
+      }
+
+      input[type="text"],
+      input[type="submit"] {
+        width: 90%;
+        padding: 10px;
+      }
+
+      #search-input {
+        padding-right: 0;
+        margin-bottom: 10px;
+      }
+
+      #logoutButton {
+        margin-left: 0;
+        margin-top: 10px;
+      }
+      th {
+        font-size: 9px; /* Adjust the font size as needed */
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .container {
+        max-width: 100%;
+      }
+
+      #add-field-form input[type="text"] {
+        width: 90%;
+        margin-bottom: 10px;
+      }
     }
   </style>
 </head>
@@ -139,7 +193,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js" type="module"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js" type="module"></script>
     <script src="doctorupdate.js" type="module"></script>
-  </div>  
+  </div>
 </body>
 
 </html>
