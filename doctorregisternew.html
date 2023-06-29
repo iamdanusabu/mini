@@ -131,6 +131,35 @@
     nav ul li:hover {
       background-color: #555;
     }
+    .loader {
+  width: 100%;
+  height: 10px;
+  background: #004643;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.inner_loader {
+  width: 60%;
+  height: 100%;
+  background: #f9bc60;
+  border-radius: 50px;
+  animation: moveLeftRight 3s ease-in-out infinite;
+}
+
+@keyframes moveLeftRight {
+  0% {
+    transform: translateX(calc(-100% + 10px));
+  }
+
+  50% {
+    transform: translateX(calc(200px - 10px));
+  }
+
+  100% {
+    transform: translateX(calc(-100% + 10px));
+  }
+}
   </style>
 </head>
 
@@ -212,6 +241,13 @@
         <button type="submit">Submit only once</button>
       </div>
     </form>
+    <!-- Add this div for the loader -->
+<div id="loader" style="display: none;">
+  <div class="loader">
+    <div class="inner_loader"></div>
+  </div>
+</div>
+
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
@@ -246,6 +282,8 @@
 
 async function submitForm(e) {
   e.preventDefault();
+  document.getElementById("loader").style.display = "block";
+
 
   const name = getElementVal("name");
   const emailid = getElementVal("emailid");
@@ -272,6 +310,8 @@ async function submitForm(e) {
 
   // Reset the form
   document.getElementById("contactForm").reset();
+  document.getElementById("loader").style.display = "none";
+
 }
 
 const saveMessages = async (name, emailid, phone, mbbsLicense, dob, college, specialization, registrationCouncil, files, aadharCardFile) => {
