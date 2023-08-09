@@ -49,7 +49,7 @@ const firebaseConfig = {
               .then(() => {
                 console.log("Patient document created in Firestore with ID:", user.uid);
                 alert("Sign up success! Document ID: " + user.uid); // Display document ID as an alert
-                // Perform any necessary actions after successful registration.
+                window.location.href="patientview.html";
               })
               .catch((error) => {
                 console.error("Error creating patient document:", error);

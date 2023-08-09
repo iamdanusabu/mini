@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Lab Reports</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1250px;
+      margin: 0 auto;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 5px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+      padding-left: 40%;
+    }
+
+    form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 20px;
+      margin-top: 30px;
+    }
+
+    label {
+      color: #333;
+      margin-bottom: 8px;
+      padding-right: 10px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 50%;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      margin-bottom: 10px;
+      font-size: 16px;
+      padding-right: 10px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      margin-left: 10px;    
+      border-radius: 3px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #fetched-data {
+      margin-top: 20px;
+      padding-left: 20%;
+      max-width: 800px;
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>View Lab Reports</h1>
+
+    <!-- Fetch Lab Report Form -->
+    <form id="fetch-lab-report-form">
+      <label for="fetch-lab-doc-id"> Doc ID:</label>
+      <input type="text" id="fetch-lab-doc-id" required>
+      <br>
+      <button type="button" id="fetch-button">Fetch Lab Report</button>
+    </form>
+
+    <!-- Display Fetched Data -->
+    <div id="fetched-data"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js" type="module"></script>
+  <script type="module">
+    // ... (JavaScript code remains the same)
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    
+    const firebaseConfig = {
+  apiKey: "AIzaSyAW_hh9ta2OJ7blpr1Xt9zcRE_rMOZKzn4",
+  authDomain: "sodium-platform-316710.firebaseapp.com",
+  projectId: "sodium-platform-316710",
+  storageBucket: "sodium-platform-316710.appspot.com",
+  messagingSenderId: "656532454851",
+  appId: "1:656532454851:web:70e00457309b64555e1176"
+};
+
+    
+    const app = initializeApp(firebaseConfig);
+    const firestore = getFirestore();
+    
+    // Fetch Lab Report Form Elements
+    const fetchLabDocIdInput = document.getElementById("fetch-lab-doc-id");
+    const fetchButton = document.getElementById("fetch-button");
+    const fetchedDataElement = document.getElementById("fetched-data");
+    
+    fetchButton.addEventListener("click", async () => {
+      const fetchLabDocId = fetchLabDocIdInput.value.trim();
+      
+      try {
+        const labDocRef = doc(firestore, "labReports", fetchLabDocId);
+        const labDocSnapshot = await getDoc(labDocRef);
+        
+        if (labDocSnapshot.exists()) {
+          const labData = labDocSnapshot.data();
+          let fetchedOutput = "<h2>Fetched Lab Report Data</h2>";
+          
+          // Create a table for displaying the fetched data
+          fetchedOutput += "<table border='1'><thead><tr><th>Number</th><th>Lab Name</th><th>Test Type</th><th>Test Date</th><th>Result</th></tr></thead><tbody>";
+          
+          // Iterate through the data and add rows to the table
+          Object.entries(labData).forEach(([serialNumber, values]) => {
+            if (Array.isArray(values) && values.length === 4) {
+              const [labName, testType, testDate, result] = values;
+              fetchedOutput += `<tr><td>${serialNumber}</td><td>${labName}</td><td>${testType}</td><td>${testDate}</td><td>${result}</td></tr>`;
+            }
+          });
+          
+          fetchedOutput += "</tbody></table>";
+          fetchedDataElement.innerHTML = fetchedOutput;
+        } else {
+          fetchedDataElement.innerHTML = "<p>Lab report not found.</p>";
+        }
+      } catch (error) {
+        console.error("Error fetching lab reports:", error);
+      }
+    });
+  </script>
+</body>
+</html>

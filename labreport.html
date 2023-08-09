@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab Report Management</title>
+</head>
+<body>
+  <div id="lab-report-page">
+    <h1>Lab Report Management</h1>
+
+    <!-- Add Lab Report Form -->
+    <form id="add-lab-report-form">
+      <label for="search-doc-id">Enter Doc ID:</label>
+      <input type="text" id="search-doc-id" required>
+      <br>
+      <label for="lab-name">Lab Name:</label>
+      <input type="text" id="lab-name" required>
+      <br>
+      <label for="test-type">Test Type:</label>
+      <input type="text" id="test-type" required>
+      <br>
+      <label for="test-date">Test Date:</label>
+      <input type="date" id="test-date" required>
+      <br>
+      <label for="result">Result:</label>
+      <input type="text" id="result" required>
+      <br>
+      <input type="submit" value="Add Lab Report">
+    </form>
+
+    <!-- Search Lab Report Form -->
+    <form id="search-lab-form">
+      <label for="search-doc-id">Search Lab Report by Doc ID:</label>
+      <input type="text" id="search-doc-id" required>
+      <input type="submit" value="Search">
+    </form>
+
+    <!-- Display Lab Report Data -->
+    <div id="lab-document-data"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js" type="module"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+  apiKey: "AIzaSyAW_hh9ta2OJ7blpr1Xt9zcRE_rMOZKzn4",
+  authDomain: "sodium-platform-316710.firebaseapp.com",
+  projectId: "sodium-platform-316710",
+  storageBucket: "sodium-platform-316710.appspot.com",
+  messagingSenderId: "656532454851",
+  appId: "1:656532454851:web:70e00457309b64555e1176"
+};
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const firestore = getFirestore();
+
+    // Lab Report Page Elements
+    const labNameInput = document.getElementById("lab-name");
+    const testTypeInput = document.getElementById("test-type");
+    const testDateInput = document.getElementById("test-date");
+    const resultInput = document.getElementById("result");
+    const addLabReportForm = document.getElementById("add-lab-report-form");
+    const searchLabForm = document.getElementById("search-lab-form");
+    const searchDocIdInput = document.getElementById("search-doc-id");
+    const labDocumentData = document.getElementById("lab-document-data");
+
+    // Add Lab Report Form Submit Event Listener
+    addLabReportForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const labReportId = searchDocIdInput.value.trim();
+      const labName = labNameInput.value.trim();
+      const testType = testTypeInput.value.trim();
+      const testDate = testDateInput.value;
+      const result = resultInput.value.trim();
+
+      try {
+        const labReportDoc = await getDoc(doc(firestore, "labReports", labReportId));
+
+        if (labReportDoc.exists()) {
+          // Document exists, update the fields
+          await updateDoc(doc(firestore, "labReports", labReportId), {
+            labName,
+            testType,
+            testDate,
+            result
+          });
+        } else {
+          // Document does not exist, create a new one
+          await setDoc(doc(firestore, "labReports", labReportId), {
+            labName,
+            testType,
+            testDate,
+            result
+          });
+        }
+
+        // Clear input fields after submission
+        searchDocIdInput.value = "";
+        labNameInput.value = "";
+        testTypeInput.value = "";
+        testDateInput.value = "";
+        resultInput.value = "";
+      } catch (error) {
+        console.error("Error adding/updating lab report:", error);
+      }
+    });
+
+// Search Lab Report Form Submit Event Listener
+searchLabForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const docId = searchDocIdInput.value.trim();
+
+      // Here you should handle Firestore interactions to search for lab reports
+      try {
+        console.log("Searching for lab report with Doc ID:", docId);
+        const labReportDoc = await getDoc(doc(firestore, "labReports", docId));
+
+        if (labReportDoc.exists()) {
+          const labReportData = labReportDoc.data();
+          console.log("Lab Report Data:", labReportData);
+          labDocumentData.innerHTML = `
+            <h2>Lab Report Details</h2>
+            <p><strong>Lab Name:</strong> ${labReportData.labName}</p>
+            <p><strong>Test Type:</strong> ${labReportData.testType}</p>
+            <p><strong>Test Date:</strong> ${labReportData.testDate}</p>
+            <p><strong>Result:</strong> ${labReportData.result}</p>
+          `;
+        } else {
+          console.log("Lab report not found for Doc ID:", docId);
+          labDocumentData.innerHTML = `<p>Lab report with Doc ID ${docId} not found.</p>`;
+        }
+      } catch (error) {
+        console.error("Error fetching lab report:", error);
+      }
+    });
+
+</script>
+</body>
+</html>

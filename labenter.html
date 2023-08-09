@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enter Lab Report Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 400px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button:focus {
+      outline: none;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .animated {
+      animation: fadeIn 0.6s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="container animated">
+    <h1>Enter Lab Report Details</h1>
+
+    <form id="add-lab-report-form">
+      <label for="lab-doc-id">Patient</label>
+      <input type="text" id="lab-doc-id" required>
+      <label for="serial-number">Sl. no.</label>
+      <input type="number" id="serial-number" required>
+      <label for="lab-name">Lab Name</label>
+      <input type="text" id="lab-name" required>
+      <label for="test-type">Test Type:</label>
+      <input type="text" id="test-type" required>
+      <label for="test-date">Test Date:</label>
+      <input type="date" id="test-date" required>
+      <label for="result">Result:</label>
+      <input type="text" id="result" required>
+      <button type="button" id="submit-button">Add Report</button>
+    </form>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js" type="module"></script>
+  <script type="module">
+    // Your Firebase and JavaScript code remains the same
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    const firebaseConfig = {
+  apiKey: "AIzaSyAW_hh9ta2OJ7blpr1Xt9zcRE_rMOZKzn4",
+  authDomain: "sodium-platform-316710.firebaseapp.com",
+  projectId: "sodium-platform-316710",
+  storageBucket: "sodium-platform-316710.appspot.com",
+  messagingSenderId: "656532454851",
+  appId: "1:656532454851:web:70e00457309b64555e1176"
+};
+
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const firestore = getFirestore();
+
+    // Lab Report Page Elements
+    const labDocIdInput = document.getElementById("lab-doc-id");
+    const serialNumberInput = document.getElementById("serial-number");
+    const labNameInput = document.getElementById("lab-name");
+    const testTypeInput = document.getElementById("test-type");
+    const testDateInput = document.getElementById("test-date");
+    const resultInput = document.getElementById("result");
+    const submitButton = document.getElementById("submit-button");
+
+    submitButton.addEventListener("click", async () => {
+      const labDocId = labDocIdInput.value.trim();
+      const serialNumber = parseInt(serialNumberInput.value);
+      const labName = labNameInput.value.trim();
+      const testType = testTypeInput.value.trim();
+      const testDate = testDateInput.value;
+      const result = resultInput.value.trim();
+
+      try {
+        // Update the lab report document with the provided serial number
+        await setDoc(doc(firestore, "labReports", labDocId), {
+          [serialNumber]: [labName, testType, testDate, result]
+        }, { merge: true });
+
+        // Clear input fields after submission
+        serialNumberInput.value = "";
+        labNameInput.value = "";
+        testTypeInput.value = "";
+        testDateInput.value = "";
+        resultInput.value = "";
+
+        alert("Lab report added successfully!");
+      } catch (error) {
+        console.error("Error adding lab report:", error);
+      }
+    });
+  </script>
+</body>
+</html>

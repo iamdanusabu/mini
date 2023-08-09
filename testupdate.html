@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Data</title>
+  <style>
+        body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 5px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      text-decoration: underline;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      margin-top: 30px;
+    }
+
+    input[type="text"],
+    input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      width: 100px;
+      cursor: pointer;
+    }
+
+    #field-input {
+      width: 100%;
+      max-width: 70px;
+    }
+
+    #search-input {
+      flex-grow: 1;
+      margin-right: 10px;
+    }
+
+    #logoutButton {
+      margin-left: auto;
+      background-color: #f44336;
+      color: #fff;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    h2 {
+      padding-left: 25px;
+      margin-left: 50px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      word-break: break-word;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 10px;
+    }
+
+    .error-message {
+      color: red;
+      margin-bottom: 10px;
+    }
+
+    .container {
+      position: relative;
+    }
+
+    #logoutButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    #search-input {
+      padding-right: 120px;
+    }
+
+    #warning-message {
+      padding-left: 0px;
+      color: red;
+    }
+
+    /* Responsive Styles */
+    @media screen and (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      form {
+        flex-direction: column;
+      }
+
+      input[type="text"],
+      input[type="submit"] {
+        width: 90%;
+        padding: 10px;
+      }
+
+      #search-input {
+        padding-right: 0;
+        margin-bottom: 10px;
+      }
+
+      #logoutButton {
+        margin-left: 0;
+        margin-top: 10px;
+      }
+      th {
+        font-size: 9px; /* Adjust the font size as needed */
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .container {
+        max-width: 100%;
+      }
+
+      #add-field-form input[type="text"] {
+        width: 90%;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Patient Data</h1>
+
+    <form id="search-form">
+      <input type="text" id="search-input" placeholder="Enter Patient ID">
+      <input type="submit" value="Search">
+    </form>
+    <button id="logoutButton" type="button">Logout</button>
+
+    <div id="documentData"></div>
+
+    <form id="add-field-form">
+      <input type="text" id="field-input" placeholder="Serial">
+      <input type="text" class="value-input" placeholder="Date">
+      <input type="text" class="value-input" placeholder="Medicine">
+      <input type="text" class="value-input" placeholder="Remarks">
+      <input type="text" class="value-input" placeholder="Hospital">
+      <input type="submit" value="Add Field">
+
+    </form>
+
+    <form id="add-diagnosis-form">
+      <input type="text" id="serial-input" placeholder="Serial">
+      <input type="text" id="date-input" placeholder="Date">
+      <input type="text" id="diagnosis-input" placeholder="Diagnosis">
+      <input type="submit" value="Add Diagnosis">
+    </form>
+
+    <div id="warning-message"></div>
+    <div class="error-message" id="error-message"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js" type="module"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyAW_hh9ta2OJ7blpr1Xt9zcRE_rMOZKzn4",
+  authDomain: "sodium-platform-316710.firebaseapp.com",
+  projectId: "sodium-platform-316710",
+  storageBucket: "sodium-platform-316710.appspot.com",
+  messagingSenderId: "656532454851",
+  appId: "1:656532454851:web:70e00457309b64555e1176"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const firestore = getFirestore();
+
+// Array of medications that may cause potential clashes
+const potentialClashMedications = [
+  ["Warfarin", "Aspirin"],
+  ["Ibuprofen", "Clopidogrel"],
+  ["Simvastatin", "Lisinopril"],
+  ["Metformin", "Contrast dye"]
+  // Add more potential clash medications if needed
+];
+
+// Array of additional patient data
+const additionalPatientData = [];
+
+// Function to create an array with 3 elements
+function createArrayWithThreeElements(serial, date, diagnosis) {
+  const newArray = [serial, date, diagnosis];
+  additionalPatientData.push(newArray);
+}
+
+// Function to display an error message
+function displayErrorMessage(message) {
+  const errorMessage = document.getElementById("error-message");
+  errorMessage.textContent = message;
+  errorMessage.style.display = "block";
+}
+
+// Function to clear the error message
+function clearErrorMessage() {
+  const errorMessage = document.getElementById("error-message");
+  errorMessage.textContent = "";
+  errorMessage.style.display = "none";
+}
+
+// Function to display the warning message
+function displayWarningMessage(message) {
+  const warningMessage = document.getElementById("warning-message");
+  warningMessage.textContent = message;
+  warningMessage.style.display = "block";
+}
+
+// Function to clear the warning message
+function clearWarningMessage() {
+  const warningMessage = document.getElementById("warning-message");
+  warningMessage.textContent = "";
+  warningMessage.style.display = "none";
+}
+
+// Function to format the date
+function formatDate(timestamp) {
+  const date = new Date(timestamp * 1000);
+  const year = date.getFullYear();
+  const month = ("0" + (date.getMonth() + 1)).slice(-2);
+  const day = ("0" + date.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
+}
+
+// Function to render the patient data
+function renderPatientData(patient) {
+  const documentData = document.getElementById("documentData");
+  documentData.innerHTML = "";
+
+  // Display basic patient information
+  const basicInfo = `
+    <h2>Patient Information</h2>
+    <p><strong>ID:</strong> ${patient.id}</p>
+    <p><strong>Name:</strong> ${patient.name}</p>
+    <p><strong>Age:</strong> ${patient.age}</p>
+    <p><strong>Gender:</strong> ${patient.gender}</p>
+    <p><strong>Phone:</strong> ${patient.phone}</p>
+  `;
+  documentData.insertAdjacentHTML("beforeend", basicInfo);
+
+  // Display medication information
+  const medicationInfo = `
+    <h2>Medication Information</h2>
+    <p><strong>Medication:</strong> ${patient.medication}</p>
+    <p><strong>Instructions:</strong> ${patient.instructions}</p>
+    <p><strong>Start Date:</strong> ${formatDate(patient.startDate)}</p>
+    <p><strong>End Date:</strong> ${formatDate(patient.endDate)}</p>
+  `;
+  documentData.insertAdjacentHTML("beforeend", medicationInfo);
+
+  // Display potential clash medications
+  const potentialClashInfo = `
+    <h2>Potential Clash Medications</h2>
+    <ul>
+      ${potentialClashMedications
+        .map(
+          (medications) => `<li>${medications[0]} + ${medications[1]}</li>`
+        )
+        .join("")}
+    </ul>
+  `;
+  documentData.insertAdjacentHTML("beforeend", potentialClashInfo);
+
+  // Display additional patient data
+  const additionalData = `
+    <h2>Additional Patient Data</h2>
+    <ul>
+      ${additionalPatientData
+        .map(
+          (data) => `<li>Serial: ${data[0]}, Date: ${data[1]}, Diagnosis: ${data[2]}</li>`
+        )
+        .join("")}
+    </ul>
+  `;
+  documentData.insertAdjacentHTML("beforeend", additionalData);
+}
+
+// Function to search for a patient by ID
+async function searchPatientById(patientId) {
+  clearErrorMessage();
+  clearWarningMessage();
+
+  try {
+    const patientDoc = doc(firestore, "patients", patientId);
+    const patientSnapshot = await getDoc(patientDoc);
+
+    if (patientSnapshot.exists()) {
+      const patientData = patientSnapshot.data();
+      renderPatientData(patientData);
+    } else {
+      displayErrorMessage("Patient not found.");
+    }
+  } catch (error) {
+    console.error(error);
+    displayErrorMessage("An error occurred while searching for the patient.");
+  }
+}
+
+// Function to handle the search form submission
+function handleSearchFormSubmit(event) {
+  event.preventDefault();
+  const searchInput = document.getElementById("search-input");
+  const patientId = searchInput.value.trim();
+  searchPatientById(patientId);
+}
+
+// Function to handle the add field form submission
+function handleAddFieldFormSubmit(event) {
+  event.preventDefault();
+  clearErrorMessage();
+  clearWarningMessage();
+
+  const fieldInput = document.getElementById("field-input");
+  const valueInputs = document.querySelectorAll(".value-input");
+
+  const serial = fieldInput.value.trim();
+  const values = Array.from(valueInputs).map((input) => input.value.trim());
+
+  if (serial === "" || values.some((value) => value === "")) {
+    displayErrorMessage("All fields must be filled.");
+    return;
+  }
+
+  createArrayWithThreeElements(serial, ...values);
+  fieldInput.value = "";
+  valueInputs.forEach((input) => (input.value = ""));
+}
+
+// Function to handle the add diagnosis form submission
+function handleAddDiagnosisFormSubmit(event) {
+  event.preventDefault();
+  clearErrorMessage();
+  clearWarningMessage();
+
+  const serialInput = document.getElementById("serial-input");
+  const dateInput = document.getElementById("date-input");
+  const diagnosisInput = document.getElementById("diagnosis-input");
+
+  const serial = serialInput.value.trim();
+  const date = dateInput.value.trim();
+  const diagnosis = diagnosisInput.value.trim();
+
+  if (serial === "" || date === "" || diagnosis === "") {
+    displayErrorMessage("All fields must be filled.");
+    return;
+  }
+
+  createArrayWithThreeElements(serial, date, diagnosis);
+  serialInput.value = "";
+  dateInput.value = "";
+  diagnosisInput.value = "";
+}
+
+// Function to handle the logout button click
+function handleLogoutButtonClick() {
+  signOut(auth)
+    .then(() => {
+      // Redirect or perform any other action after logout
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+// Function to check if a medication may cause potential clashes
+function checkPotentialClash(medication) {
+  for (let i = 0; i < potentialClashMedications.length; i++) {
+    const medications = potentialClashMedications[i];
+    if (medications.includes(medication)) {
+      displayWarningMessage(
+        `Warning: ${medications[0]} and ${medications[1]} may cause potential clashes.`
+      );
+      break;
+    }
+  }
+}
+
+// Function to handle the medication input change event
+function handleMedicationInputChange(event) {
+  clearWarningMessage();
+  const medication = event.target.value.trim();
+  checkPotentialClash(medication);
+}
+
+// Add event listeners
+document.getElementById("search-form").addEventListener("submit", handleSearchFormSubmit);
+document.getElementById("add-field-form").addEventListener("submit", handleAddFieldFormSubmit);
+document.getElementById("add-diagnosis-form").addEventListener("submit", handleAddDiagnosisFormSubmit);
+document.getElementById("logoutButton").addEventListener("click", handleLogoutButtonClick);
+
+// Check if user is logged in
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is logged in
+    // You can perform any other actions here
+  } else {
+    // User is not logged in
+    // Redirect or perform any other action
+  }
+});
+
+    </script>
+  </div>
+</body>
+
+</html>
